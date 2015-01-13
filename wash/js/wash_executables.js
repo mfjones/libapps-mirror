@@ -13,7 +13,10 @@ wash.executables.install = function(jsfs, path, onSuccess, onError) {
   var exes = {};
   for (var key in wash.executables.callbacks) {
     var callback = wash.executables.callbacks[key];
-    exes[key] = new wam.jsfs.Executable(callback);
+    if (key == 'mount')
+      exes[key] = new wam.jsfs.Executable(callback.bind(null, jsfs));
+    else
+      exes[key] = new wam.jsfs.Executable(callback);
   }
 
   jsfs.makeEntries(path, exes, onSuccess, onError);
@@ -66,6 +69,106 @@ wash.executables.callbacks['cat'] = function(executeContext) {
 
   catNextArg();
 };
+
+/**
+ * Usage: run <app>
+ *
+ * Run the specified app using shared modules.
+ */
+wash.executables.callbacks['run'] = function(executeContext) {
+  executeContext.ready();
+  if (wash.shared_modules.apps[executeContext.arg] != undefined)
+    wash.shared_modules.apps[executeContext.arg].SMmain();
+  else
+    executeContext.stderr("App not found. Only `test` and `vimount` for now.\n");
+
+  executeContext.closeOk(null);
+}
+
+/**
+ * Usage: mount <source> <target>
+ *
+ * Mounts files from the user's OS into a local sandbox.
+ *
+ * E.g. mount ~/Desktop/test /test loads the test directory from the Desktop
+ * into a local, sandboxed test folder.
+ */
+wash.executables.callbacks['mount'] = function(jsfs, executeContext) {
+  executeContext.ready();
+
+  var twContentWindow = window.tw_.wmWindow_.appWindow_.contentWindow;
+  twContentWindow.chrome.fileSystem.chooseEntry(
+    {'type': 'openDirectory'},
+    function(dirEntry) {
+      var entryId = chrome.fileSystem.retainEntry(dirEntry);
+      chrome.fileSystem.getDisplayPath(dirEntry, function(localPath) {
+        var ary = localPath.split("/");
+        var path = "/" + ary[ary.length - 1];
+        wash.mounted.addMount(entryId, localPath, path);
+        executeContext.stdout(
+          "Local path: " + path + ".\n(ID: " + entryId + ")\n")
+        executeContext.closeOk(null);
+      });
+    });
+}
+
+// Recursively list a directory.
+function list_dir(dirEntry, callback, topLevel, secondCallback, listing) {
+  if (listing === undefined)
+    listing = [];
+
+  var reader = dirEntry.createReader();
+  var read_some = reader.readEntries.bind(reader, function(entries) {
+    if (entries.length === 0) {
+      callback(listing);
+      if (topLevel)
+        secondCallback();
+      return;
+    }
+    process_some(entries, 0);
+    function process_some(entries, i) {
+      for(; i < entries.length; i++) {
+        listing.push(entries[i]);
+        if (entries[i].isDirectory) {
+          return list_dir(
+            entries[i], process_some.bind(null, entries, i + 1),
+            false, secondCallback, listing);
+        }
+      }
+      read_some();
+    }
+  }, function() {
+    console.error('error reading directory');
+  });
+  read_some();
+}
+
+wash.executables.callbacks['ls2'] = function(executeContext) {
+  executeContext.ready();
+
+  var arg = executeContext.arg[0];
+  wash.mounted.getRootDirectory(arg,
+    function(dirEntry) {
+      dirEntry && dirEntry.isDirectory &&
+        list_dir(dirEntry, function(listing) {
+          listing.forEach(function(entry) {
+            if (entry.fullPath.indexOf(arg) == 0)
+              var out = entry.fullPath.slice(arg.length).slice(1);
+              // If we still have a slash, then this file is inside
+              // a directory, skip it.
+              if (out && out.indexOf("/") === -1) {
+                if (entry.isDirectory)
+                  out += "/";
+                executeContext.stdout(out + "\n");
+              }
+          });
+        }, true, function() { executeContext.closeOk(null); });
+    }, function() {
+      executeContext.stdout("Not found\n");
+      executeContext.closeOk(null);
+    }
+  );
+}
 
 /**
  * Usage: cp <source> ... <target>
