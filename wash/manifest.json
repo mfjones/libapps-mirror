@@ -27,16 +27,37 @@
     },
     {
       "id": "cpefnblmmeilonjccjohpnhhhlodpbfj" // vim mount
+    },
+    {
+      "id": "inonfcfhpepfpchobkioohbfmadgmmdh" // saltpig
     }
   ],
-  // For vim mount
-  "permissions": [ {
+  // For vim mount and saltpig
+  "permissions": [
+    {
       "fileSystem": [ "write", "directory", "retainEntries" ]
-   }, "clipboardRead", "clipboardWrite", "storage", "unlimitedStorage" ],
-   "file_handlers": {
-      "edit": {
-         "extensions": [ "json", "txt", "js", "html", "h", "c", "cc", "cpp", "java" ],
-         "types": [ "text/*" ]
-      }
-   }
+    },
+    "clipboardRead",
+    "clipboardWrite",
+    "storage",
+    "unlimitedStorage",
+    "storage",
+    "unlimitedStorage",
+    {
+      "socket": [
+        "tcp-listen:*:*",
+        "tcp-connect",
+        "resolve-host",
+        "udp-bind:*:*",
+        "udp-send-to:*:*"
+      ]
+    }
+  ],
+  "file_handlers": {
+    "edit": {
+      "extensions": [ "json", "txt", "js", "html", "h", "c", "cc", "cpp", "java" ],
+      "types": [ "text/*" ]
+    }
+  },
+  "offline_enabled": true
 }

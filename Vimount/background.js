@@ -49,7 +49,7 @@ function saveFile(saveFileEntry) {
   });
 }
 
-function launchVim(fileEntry) {
+function launchVim(fileEntry, mounts) {
   function onWindowCreated(win) {
     win.contentWindow.fileEntryToLoad = fileEntry;
     if (fileEntry)
@@ -65,6 +65,8 @@ function launchVim(fileEntry) {
       }
     }
 
+    vimount.appWin = win.contentWindow.window;
+    vimount.appWin.washMounts = mounts;
     win.onClosed.addListener(onWindowClosed);
   }
 
@@ -86,12 +88,45 @@ function onLaunchedListener(launchData) {
 // chrome.app.runtime.onLaunched.addListener(onLaunchedListener);
 
 var vimount = {};
-vimount.SMmain = function() {
+vimount.appWin = null;
+
+vimount.SMmain = function(mounts) {
   var fileEntry;
-  launchVim(fileEntry);
+  launchVim(fileEntry, mounts);
 }
+
 vimount.registerSelf = function() {
   wash.shared_modules.register("vimount", this);
+  wash.shared_modules.needsMounts("vimount");
+}
+
+vimount.handleAddMount = function(newMount) {
+  vimount.appWin.mounts &&
+    vimount.appWin.mounts.forEach(function(existingMount) {
+      if (existingMount.entryId == newMount.entryId)
+        return;
+    });
+
+  var mount = {};
+  mount.mountPoint = newMount.path;
+  mount.entry = newMount.entry;
+  mount.localPath = newMount.localPath;
+  mount.mounted = true;
+  mount.entryId = newMount.entryId;
+  mount.needsMount = true;
+  vimount.appWin.mounts.push(mount);
+  var mountControl = vimount.appWin.addMountControl(mount, null);
+  vimount.appWin.mounterClient.onMount(mountControl.mount, function() {
+    vimount.appWin.populateMountControl(mountControl);
+  });
+}
+
+vimount.handleRemoveMount = function(mount) {
+  vimount.appWin.handleRemoveMount(mount);
+}
+
+vimount.isRunning = function() {
+  return vimount.appWin !== null;
 }
 
 vimount.registerSelf();

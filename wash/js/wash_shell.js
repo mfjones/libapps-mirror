@@ -61,6 +61,7 @@ wash.Shell.instances = [];
  */
 wash.Shell.main = function(executeContext) {
   var shell = new wash.Shell(executeContext);
+  wash.mounter.restoreWashMountsFromStorage();
   shell.onInit.addListener(shell.repl.bind(shell));
 };
 

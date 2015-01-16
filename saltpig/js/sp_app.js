@@ -6,7 +6,7 @@
 
 sp.App = function() {
   this.onInit = new lib.Event(this.onInit_.bind(this));
-  this.jsfs = new wam.jsfs.FileSystem();
+  this.jsfs = window.app_.jsfs;
   var onError = function(value) { console.log('install failed: ' + value) };
   this.installExecutables(function() {
       this.installDOMFS(this.onInit, onError);
@@ -15,7 +15,7 @@ sp.App = function() {
 };
 
 sp.App.prototype.installDOMFS = function(onSuccess, onError) {
-  this.jsfs.makeEntry('domfs', new wam.jsfs.dom.FileSystem(),
+  this.jsfs.makeEntry('/apps/saltpig/domfs', new wam.jsfs.dom.FileSystem(),
                       onSuccess, onError);
 };
 
@@ -38,7 +38,13 @@ sp.App.prototype.installExecutables = function(onSuccess, onError) {
     jsexes[key] = new wam.jsfs.Executable(callback);
   }
 
-  this.jsfs.makeEntries('/exe', jsexes, onSuccess, onError);
+  this.jsfs.makeEntries('/apps/saltpig/exe', jsexes, onSuccess, onError);
+
+  // Include these new exes in all shell instances.
+  wash.Shell.instances.forEach(function(instance) {
+    var path = instance.executeContext.getEnvs()["PATH"];
+    path.push('/apps/saltpig/exe')
+  });
 };
 
 sp.App.prototype.installHandlers = function(runtime) {

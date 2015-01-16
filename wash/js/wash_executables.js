@@ -77,9 +77,13 @@ wash.executables.callbacks['cat'] = function(executeContext) {
  */
 wash.executables.callbacks['run'] = function(executeContext) {
   executeContext.ready();
-  if (wash.shared_modules.apps[executeContext.arg] != undefined)
-    wash.shared_modules.apps[executeContext.arg].SMmain();
-  else
+  var appName = executeContext.arg[0];
+  if (wash.shared_modules.apps[appName] != undefined) {
+    if (wash.shared_modules.handlesMounts[appName])
+      wash.shared_modules.apps[appName].SMmain(wash.mounter.mounts);
+    else
+      wash.shared_modules.apps[appName].SMmain();
+  } else
     executeContext.stderr("App not found. Only `test` and `vimount` for now.\n");
 
   executeContext.closeOk(null);
@@ -95,21 +99,51 @@ wash.executables.callbacks['run'] = function(executeContext) {
  */
 wash.executables.callbacks['mount'] = function(jsfs, executeContext) {
   executeContext.ready();
+  var USAGE = "Usage: mount [add | ls | rm | help]\n";
 
-  var twContentWindow = window.tw_.wmWindow_.appWindow_.contentWindow;
-  twContentWindow.chrome.fileSystem.chooseEntry(
-    {'type': 'openDirectory'},
-    function(dirEntry) {
-      var entryId = chrome.fileSystem.retainEntry(dirEntry);
-      chrome.fileSystem.getDisplayPath(dirEntry, function(localPath) {
-        var ary = localPath.split("/");
-        var path = "/" + ary[ary.length - 1];
-        wash.mounted.addMount(entryId, localPath, path);
-        executeContext.stdout(
-          "Local path: " + path + ".\n(ID: " + entryId + ")\n")
-        executeContext.closeOk(null);
+  if (!executeContext.arg) {
+    executeContext.stdout(USAGE);
+    executeContext.closeOk(null);
+    return;
+  }
+
+  var command = executeContext.arg[0];
+  if (command === 'add') {
+    var twContentWindow = window.tw_.wmWindow_.appWindow_.contentWindow;
+    twContentWindow.chrome.fileSystem.chooseEntry(
+      {'type': 'openDirectory'},
+      function(dirEntry) {
+        var entryId = chrome.fileSystem.retainEntry(dirEntry);
+        chrome.fileSystem.getDisplayPath(dirEntry, function(localPath) {
+          var ary = localPath.split("/");
+          var path = "/" + ary[ary.length - 1];
+          wash.mounter.addMount(dirEntry, entryId, localPath, path);
+          executeContext.stdout(
+            "Local path: " + path + ".\n(ID: " + entryId + ".)\n")
+          executeContext.closeOk(null);
+        });
       });
+  } else if (command === 'ls') {
+    wash.mounter.mounts.forEach(function(mount) {
+      executeContext.stdout(mount.path + "\t[" + mount.localPath + "]\n");
     });
+    executeContext.closeOk(null);
+  } else if (command === 'rm') {
+    var mountToRemove = executeContext.arg[1];
+    wash.mounter.removeMount(mountToRemove, function() {
+      executeContext.stdout('Removed ' + mountToRemove + ".\n");
+      executeContext.closeOk(null);
+    }, function() {
+      executeContext.stdout('Could not find mount.\n');
+      executeContext.closeOk(null);
+    });
+  } else if (command === 'help') {
+    executeContext.stdout("add - Mounts a folder into wash from your local file system.\nls - List the current mounts you have added.\n\tFormat: <path> [<local path>]\nrm - Removes a mount given the <path> (see `ls`).\n");
+    executeContext.closeOk(null);
+  } else {
+    executeContext.stdout(USAGE);
+    executeContext.closeOk(null);
+  }
 }
 
 // Recursively list a directory.
@@ -147,7 +181,7 @@ wash.executables.callbacks['ls2'] = function(executeContext) {
   executeContext.ready();
 
   var arg = executeContext.arg[0];
-  wash.mounted.getRootDirectory(arg,
+  wash.mounter.getRootDirectory(arg,
     function(dirEntry) {
       dirEntry && dirEntry.isDirectory &&
         list_dir(dirEntry, function(listing) {

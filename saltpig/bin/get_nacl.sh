@@ -6,7 +6,7 @@
 
 cd "$(readlink -f "$(dirname "$0")/..")"
 
-VPATH="pepper_36/1260"
+VPATH="pepper_37/1338"
 BASE="http://gsdview.appspot.com/nativeclient-mirror/naclports/$VPATH/publish/"
 
 PATHS="\

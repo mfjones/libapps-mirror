@@ -4,35 +4,44 @@
 
 'use strict';
 
-(function() {
-  var didLaunch = false;
+var spapp = {};
 
-  /**
-   * Used to watch for launch events that occur before we're ready to handle
-   * them.
-   */
-  var onLaunched = function() { didLaunch = true };
-  chrome.app.runtime.onLaunched.addListener(onLaunched);
+spapp.SMmain = function() {
+  (function() {
+    var didLaunch = false;
 
-  /**
-   * Perform any required async initialization, then create our app instance.
-   *
-   * The window.app_ property will contain the new app instance so it can be
-   * reached from the background page's JS console.
-   */
-  lib.init(function sp_background() {
-      var app = new sp.App();
+    /**
+     * Used to watch for launch events that occur before we're ready to handle
+     * them.
+     */
+    var onLaunched = function() { didLaunch = true };
+    chrome.app.runtime.onLaunched.addListener(onLaunched);
 
-      app.onInit.addListener(function() {
-          chrome.app.runtime.onLaunched.removeListener(onLaunched);
+    /**
+     * Perform any required async initialization, then create our app instance.
+     *
+     * The window.app_ property will contain the new app instance so it can be
+     * reached from the background page's JS console.
+     */
+    lib.init(function sp_background() {
+        var app = new sp.App();
 
-          app.installHandlers(chrome.app.runtime);
+        app.onInit.addListener(function() {
+            chrome.app.runtime.onLaunched.removeListener(onLaunched);
 
-          if (didLaunch)
-            app.onLaunched();
-        });
+            app.installHandlers(chrome.app.runtime);
 
-      // Exported for console debugging.
-      window.app_ = app;
-    }, console.log.bind(console));
-})();
+            if (didLaunch)
+              app.onLaunched();
+          });
+
+        // Exported for console debugging.
+        window.sp_app_ = app;
+      }, console.log.bind(console));
+  })();
+}
+
+spapp.registerSelf = function() {
+  wash.shared_modules.register("saltpig", this);
+}
+spapp.registerSelf();

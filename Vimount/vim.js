@@ -58,6 +58,31 @@ function restoreMounts(callback) {
 
     if (item && Array.isArray(item.mounts))
       mounts = item.mounts;
+
+    // Add in extra mounts received from wash.
+    if (washMounts) {
+      washMounts.forEach(function(m) {
+        var found = false;
+
+        mounts.forEach(function(existingMount) {
+          if (existingMount.entryId == m.entryId) {
+            found = true;
+          }
+        });
+
+        if (!found) {
+          var mount = {};
+          mount.mountPoint = m.path;
+          mount.entry = m.entry;
+          mount.localPath = m.localPath;
+          mount.mounted = true;
+          mount.entryId = m.entryId;
+          mount.needsMount = true;
+          mounts.push(mount);
+        }
+      });
+    }
+
     // Make sure restored state is sensible.
     mounts.forEach(function(mount) {
       mount.entry = null;
