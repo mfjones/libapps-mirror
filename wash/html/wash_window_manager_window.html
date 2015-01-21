@@ -24,7 +24,7 @@
         -webkit-app-region: drag;
       }
 
-      #wash_window_close {
+      #wash_window_close, #mounter_close {
         position: absolute;
         top: 0;
         right: 0px;
@@ -35,6 +35,26 @@
         color: #555;
         text-align: center;
         -webkit-app-region: no-drag;
+        cursor: pointer;
+      }
+
+      #wash_window_mount {
+        top: 0;
+        right: 30px;
+        position: absolute;
+        margin: 4px 0 0 0;
+        padding: 3px;
+        text-align: center;
+        border: 1px solid rgb(107, 107, 107);
+        border-radius: 5px;
+        font-size: 11px;
+        color: rgb(107, 107, 107);
+        cursor: pointer;
+      }
+
+      #wash_window_mount:hover {
+        color: black;
+        border: 1px solid black;
       }
 
       #wash_window_content {
@@ -47,10 +67,18 @@
         border-right: 1px black solid;
       }
     </style>
+    <link rel="stylesheet" type="text/css" href="mounter.css">
   </head>
   <body>
+    <div id='mounter_background'>
+      <div id='mounter'>
+        <div id='mounter_header'>Folders mounted into wash</div>
+        <div id='mounter_close'>&#x2A2F;</div>
+      </div>
+    </div>
     <div id='wash_window_outer'>
       <div id='wash_window_titlebar'>
+        <div id='wash_window_mount'>mount</div>
         <div id='wash_window_close'>&#x2A2F;</div>
       </div>
       <div id='wash_window_content'></div>

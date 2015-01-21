@@ -122,7 +122,14 @@ vimount.handleAddMount = function(newMount) {
 }
 
 vimount.handleRemoveMount = function(mount) {
-  vimount.appWin.handleRemoveMount(mount);
+  vimount.appWin.mounts &&
+    vimount.appWin.mounts.forEach(function(existingMount) {
+      if (existingMount.entryId == mount.entryId) {
+        vimount.appWin.mounterClient.onUnmount(existingMount, function() {
+          vimount.appWin.mounterClient.onRemoveMount(existingMount);
+        });
+      }
+    });
 }
 
 vimount.isRunning = function() {
