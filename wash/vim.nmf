@@ -1,9 +1,8 @@
 {
+  "files": {},
   "program": {
-    "portable": {
-      "pnacl-translate": {
-        "url": "vim_pnacl.pexe"
-      }
+    "x86-64": {
+      "url": "vim_x86_64.nexe"
     }
   }
 }

@@ -3,6 +3,10 @@
 wash.mounter = {};
 wash.mounter.mounts = [];
 
+wash.mounter.ops = {};
+wash.mounter.nextOpId = 0;
+wash.mounter.win = null;
+
 wash.mounter.mount = function(entry, entryId, localPath, path) {
   this.entry = entry;
   this.entryId = entryId;
@@ -21,8 +25,14 @@ wash.mounter.addMount = function(entry, entryId, localPath, path) {
     }
   }
 
-  wash.mounter.saveWashMounts();
-  syncMounts();
+  if (typeof window.tw_.term.command !== 'undefined' &&
+      window.tw_.term.command !== null) {
+    // Send a message to the currently running NaCl application
+    wash.mounter.addNaClMount(m, true);
+  } else {
+    wash.mounter.saveWashMounts();
+    syncMounts();
+  }
 }
 
 wash.mounter.removeMount = function(path, callback, callbackError) {
@@ -105,7 +115,6 @@ var mounter = null;
 var mounterHeader = null;
 var mounterBtn = null;
 var mounterCloseBtn = null;
-var win = null;
 var terminal = null;
 
 function intToPixels(int) {
@@ -154,15 +163,19 @@ function releaseFocus() {
     }
     return true;
   });
-  terminal.focus();
+
+  if (typeof window.tw_.term.command !== 'undefined')
+    window.tw_.term.focus();
+  else
+    terminal.focus();
 }
 
 function sizeBackground() {
   // TODO: call this on window size.
-  mounterBackground.style.height = intToPixels(win.innerHeight);
+  mounterBackground.style.height = intToPixels(wash.mounter.win.innerHeight);
   var bgTop = 0;
   if (!isVisible)
-    bgTop = win.innerHeight
+    bgTop = wash.mounter.win.innerHeight
   mounterBackground.style.top = intToPixels(bgTop);
 }
 
@@ -188,7 +201,7 @@ function mountCloseBtnClicked(event) {
 }
 
 function newMountClicked(event) {
-  win.chrome.fileSystem.chooseEntry(
+  wash.mounter.win.chrome.fileSystem.chooseEntry(
     {'type': 'openDirectory'},
     function(dirEntry) {
       var entryId = chrome.fileSystem.retainEntry(dirEntry);
@@ -201,7 +214,7 @@ function newMountClicked(event) {
 }
 
 function removeMountClicked(event) {
-  var mount = event.target.mountControl.mounts;
+  var mount = event.target.mountControl.mount;
   var index = wash.mounter.mounts.indexOf(mount);
   wash.mounter.mounts.splice(index, 1);
 
@@ -212,15 +225,20 @@ function removeMountClicked(event) {
     }
   }
 
-  wash.mounter.saveWashMounts();
-  syncMounts();
+  if (typeof window.tw_.term.command !== 'undefined' &&
+      window.tw_.term.command !== null) {
+    wash.mounter.removeNaClMount(mount, true);
+  } else {
+    wash.mounter.saveWashMounts();
+    syncMounts();
+  }
 }
 
 function addNewMountControl() {
-  var newMountControl = win.document.createElement('div');
+  var newMountControl = wash.mounter.win.document.createElement('div');
   newMountControl.classList.add('mount_control');
 
-  var addButton = win.document.createElement('button');
+  var addButton = wash.mounter.win.document.createElement('button');
   addButton.innerHTML = 'Add Mount';
   addButton.onclick = newMountClicked;
   addButton.classList.add('addOrRemoveButton');
@@ -339,13 +357,13 @@ function syncMounts() {
 }
 
 wash.mounter.preInitMounter = function() {
-  win = window.tw_.wmWindow_.appWindow_.contentWindow;
-  terminal = win.document.getElementById('wash_window_outer');
-  mounter = win.document.getElementById('mounter');
-  mounterBackground = win.document.getElementById('mounter_background');
-  mounterHeader = win.document.getElementById('mounter_header');
-  mounterBtn = win.document.getElementById('wash_window_mount');
-  mounterCloseBtn = win.document.getElementById('mounter_close');
+  wash.mounter.win = window.tw_.wmWindow_.appWindow_.contentWindow;
+  terminal = wash.mounter.win.document.getElementById('wash_window_outer');
+  mounter = wash.mounter.win.document.getElementById('mounter');
+  mounterBackground = wash.mounter.win.document.getElementById('mounter_background');
+  mounterHeader = wash.mounter.win.document.getElementById('mounter_header');
+  mounterBtn = wash.mounter.win.document.getElementById('wash_window_mount');
+  mounterCloseBtn = wash.mounter.win.document.getElementById('mounter_close');
 
   mounterBtn.onclick = mountBtnClicked;
   mounterCloseBtn.onclick = mountCloseBtnClicked;
@@ -357,4 +375,80 @@ wash.mounter.preInitMounter = function() {
   wash.mounter.mounts.forEach(function(mount) {
     lastMountControl = addMountControl(mount, lastMountControl);
   });
+}
+
+/*********************************************
+
+FUNCTIONS FOR NaCl MOUNTER
+
+********************************************/
+wash.mounter.handleResult = function(msg) {
+  if (msg.operation == "start") {
+    wash.mounter.mounts.forEach(function(mount) {
+      wash.mounter.addNaClMount(mount, false);
+    });
+    return;
+  }
+
+  if (!wash.mounter.ops[msg.operationId]) {
+    console.log('no matching op');
+    return;
+  }
+
+  if (msg.result) {
+    // success
+    console.log("Mounted!");
+  }
+
+  wash.mounter.ops[msg.operationId].callback &&
+      wash.mounter.ops[msg.operationId].callback();
+  delete wash.mounter.ops[msg.operationId];
+}
+
+wash.mounter.addNaClMount = function(mount, withCallback) {
+  var mountOp = {};
+  var operationId = wash.mounter.nextOpId++;
+  mountOp.mount = mount;
+  if (withCallback) {
+    mountOp.callback = function() {
+      wash.mounter.saveWashMounts();
+      syncMounts();
+    }
+  }
+  wash.mounter.ops[operationId] = mountOp;
+
+  var parameters = {}
+  parameters.filesystem = mount.entry.filesystem;
+  parameters.fullPath = mount.entry.fullPath;
+  parameters.mountPoint = mount.path;
+  parameters.operationId = operationId.toString();
+
+  var message = {};
+  message.mount = parameters;
+
+  window.tw_.term.command.processManager.
+      foregroundProcess.postMessage(message);
+}
+
+wash.mounter.removeNaClMount = function(mount, withCallback) {
+  var unmountOp = {};
+  var operationId = wash.mounter.nextOpId++;
+  unmountOp.mount = mount;
+  if (withCallback) {
+    unmountOp.callback = function() {
+      wash.mounter.saveWashMounts();
+      syncMounts();
+    }
+  }
+  wash.mounter.ops[operationId] = unmountOp;
+
+  var parameters = {};
+  parameters.mountPoint = mount.path;
+  parameters.operationId = operationId.toString();
+
+  var message = {};
+  message.unmount = parameters;
+
+  window.tw_.term.command.processManager.
+      foregroundProcess.postMessage(message);
 }

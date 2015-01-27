@@ -25,7 +25,7 @@ test.SMmain = function(mounts) {
 
 test.registerSelf = function() {
   wash.shared_modules.register("test", this);
-  // wash.shared_modules.needsMounts("test");
+  wash.shared_modules.needsMounts("test");
 }
 
 test.handleAddMount = function(mount) {

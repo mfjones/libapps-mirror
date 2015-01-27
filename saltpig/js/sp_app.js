@@ -43,7 +43,7 @@ sp.App.prototype.installExecutables = function(onSuccess, onError) {
   // Include these new exes in all shell instances.
   wash.Shell.instances.forEach(function(instance) {
     var path = instance.executeContext.getEnvs()["PATH"];
-    path.push('/apps/saltpig/exe')
+    path.push('/apps/saltpig/exe');
   });
 };
 

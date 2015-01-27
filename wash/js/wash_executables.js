@@ -89,6 +89,25 @@ wash.executables.callbacks['run'] = function(executeContext) {
   executeContext.closeOk(null);
 }
 
+wash.executables.callbacks['vim'] = function(executeContext) {
+  executeContext.ready();
+  window.NaClTerm.nmf = 'vim.nmf';
+  window.NaClTerm.init();
+  window.tw_.term.command.processManager.resultHandler =
+      wash.mounter.handleResult;
+  executeContext.closeOk(null);
+}
+
+wash.executables.callbacks['ruby'] = function(executeContext) {
+  executeContext.ready();
+  window.NaClTerm.nmf = 'ruby.nmf';
+  window.NaClTerm.argv = ['/bin/irb'];
+  window.NaClTerm.init();
+  window.tw_.term.command.processManager.resultHandler =
+      wash.mounter.handleResult;
+  executeContext.closeOk(null);
+}
+
 /**
  * Usage: mount <source> <target>
  *
