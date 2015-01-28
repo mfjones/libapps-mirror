@@ -92,19 +92,34 @@ wash.executables.callbacks['run'] = function(executeContext) {
 wash.executables.callbacks['vim'] = function(executeContext) {
   executeContext.ready();
   window.NaClTerm.nmf = 'vim.nmf';
+  window.NaClTerm.argv = executeContext.arg;
   window.NaClTerm.init();
   window.tw_.term.command.processManager.resultHandler =
       wash.mounter.handleResult;
+  executeContext.stdout('\n');
   executeContext.closeOk(null);
 }
 
 wash.executables.callbacks['ruby'] = function(executeContext) {
   executeContext.ready();
   window.NaClTerm.nmf = 'ruby.nmf';
+  window.NaClTerm.argv = executeContext.arg;
+  window.NaClTerm.init();
+  window.tw_.term.command.processManager.resultHandler =
+      wash.mounter.handleResult;
+  executeContext.stdout('\n');
+  executeContext.closeOk(null);
+}
+
+wash.executables.callbacks['irb'] = function(executeContext) {
+  executeContext.ready();
+  window.NaClTerm.nmf = 'ruby.nmf';
+  // Start up irb as an additional argument.
   window.NaClTerm.argv = ['/bin/irb'];
   window.NaClTerm.init();
   window.tw_.term.command.processManager.resultHandler =
       wash.mounter.handleResult;
+  executeContext.stdout('\n');
   executeContext.closeOk(null);
 }
 
