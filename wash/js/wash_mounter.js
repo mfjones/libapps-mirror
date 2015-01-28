@@ -99,8 +99,15 @@ wash.mounter.restoreWashMountsFromStorage = function(callback) {
   chrome.storage.local.get('wash_mounts', function(item) {
     if (item && Array.isArray(item.wash_mounts)) {
       wash.mounter.mounts = item.wash_mounts;
-      callback();
+
+      // Restore the entry
+      wash.mounter.mounts.forEach(function(mount) {
+        chrome.fileSystem.restoreEntry(mount.entryId, function(entry) {
+          mount.entry = entry;
+        });
+      });
     }
+    callback();
   });
 }
 
@@ -384,9 +391,7 @@ FUNCTIONS FOR NaCl MOUNTER
 ********************************************/
 wash.mounter.handleResult = function(msg) {
   if (msg.operation == "start") {
-    wash.mounter.mounts.forEach(function(mount) {
-      wash.mounter.addNaClMount(mount, false);
-    });
+    wash.mounter.addMountsFromStartup();
     return;
   }
 
@@ -403,6 +408,12 @@ wash.mounter.handleResult = function(msg) {
   wash.mounter.ops[msg.operationId].callback &&
       wash.mounter.ops[msg.operationId].callback();
   delete wash.mounter.ops[msg.operationId];
+}
+
+wash.mounter.addMountsFromStartup = function() {
+  wash.mounter.mounts.forEach(function(mount) {
+    wash.mounter.addNaClMount(mount, false);
+  });
 }
 
 wash.mounter.addNaClMount = function(mount, withCallback) {
