@@ -8,31 +8,21 @@
     "128": "images/dev/128.png"
   },
   "description": "Command line shell for the web.",
-  "offline_enabled": true,
-  "permissions": [
-    "clipboardRead",
-    "clipboardWrite",
-    "unlimitedStorage",
-    "storage",
-    "http://*/*",
-    "https://*/*"
-  ],
   "app": {
     "background": {
       "page": "main.html"
     }
   },
   "import": [{
-      "id": "gpcckkmippodnppallflahfabmeilgjg" // test shared module app
+      "id": "gpcckkmippodnppallflahfabmeilgjg"
     },
     {
-      "id": "cpefnblmmeilonjccjohpnhhhlodpbfj" // vim mount
+      "id": "cpefnblmmeilonjccjohpnhhhlodpbfj"
     },
     {
-      "id": "inonfcfhpepfpchobkioohbfmadgmmdh" // saltpig
+      "id": "inonfcfhpepfpchobkioohbfmadgmmdh"
     }
   ],
-  // For vim mount and saltpig
   "permissions": [
     {
       "fileSystem": [ "write", "directory", "retainEntries" ]
@@ -41,8 +31,8 @@
     "clipboardWrite",
     "storage",
     "unlimitedStorage",
-    "storage",
-    "unlimitedStorage",
+    "http://*/*",
+    "https://*/*",
     {
       "socket": [
         "tcp-listen:*:*",
