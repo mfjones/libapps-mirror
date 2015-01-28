@@ -83,8 +83,13 @@ wash.executables.callbacks['run'] = function(executeContext) {
       wash.shared_modules.apps[appName].SMmain(wash.mounter.mounts);
     else
       wash.shared_modules.apps[appName].SMmain();
-  } else
-    executeContext.stderr("App not found. Only `test` and `vimount` for now.\n");
+  } else {
+    var availableApps = "";
+    for (var appName in wash.shared_modules.apps) {
+      availableApps += "* " + appName + "\n";
+    }
+    executeContext.stderr("App not found. Installed apps:\n" + availableApps);
+  }
 
   executeContext.closeOk(null);
 }
