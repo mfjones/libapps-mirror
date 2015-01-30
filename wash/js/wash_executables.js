@@ -216,10 +216,22 @@ function list_dir(dirEntry, callback, topLevel, secondCallback, listing) {
   read_some();
 }
 
-wash.executables.callbacks['ls2'] = function(executeContext) {
+wash.executables.callbacks['lsm'] = function(executeContext) {
   executeContext.ready();
 
+  if (!executeContext.arg) {
+    wash.mounter.mounts.forEach(function(mount) {
+      executeContext.stdout(mount.path.slice(1) + '/\n');
+    });
+    executeContext.closeOk(null);
+  }
+
   var arg = executeContext.arg[0];
+  if (!arg.startsWith('/'))
+    arg = '/' + arg;
+  if (arg.endsWith('/'))
+    arg = arg.substring(0, arg.length-1);
+
   wash.mounter.getRootDirectory(arg,
     function(dirEntry) {
       dirEntry && dirEntry.isDirectory &&
