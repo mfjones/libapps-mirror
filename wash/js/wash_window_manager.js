@@ -41,6 +41,9 @@ wash.WindowManager.Window.prototype.createAppWindow_ = function(
         this.onClosed_.bind(this));
     appWindow.contentWindow.addEventListener(
         'load', this.onContentLoaded_.bind(this, onComplete));
+    appWindow.onBoundsChanged.addListener(function() {
+      sizeBackground();
+    });
   }.bind(this);
 
   this.pendingAppWindow_ = true;

@@ -224,6 +224,7 @@ wash.executables.callbacks['lsm'] = function(executeContext) {
       executeContext.stdout(mount.path.slice(1) + '/\n');
     });
     executeContext.closeOk(null);
+    return;
   }
 
   var arg = executeContext.arg[0];
