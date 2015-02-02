@@ -101,7 +101,6 @@ wash.executables.callbacks['vim'] = function(executeContext) {
   window.NaClTerm.init();
   window.tw_.term.command.processManager.resultHandler =
       wash.mounter.handleResult;
-  executeContext.stdout('\n');
   executeContext.closeOk(null);
 }
 
@@ -112,7 +111,6 @@ wash.executables.callbacks['ruby'] = function(executeContext) {
   window.NaClTerm.init();
   window.tw_.term.command.processManager.resultHandler =
       wash.mounter.handleResult;
-  executeContext.stdout('\n');
   executeContext.closeOk(null);
 }
 
@@ -124,7 +122,6 @@ wash.executables.callbacks['irb'] = function(executeContext) {
   window.NaClTerm.init();
   window.tw_.term.command.processManager.resultHandler =
       wash.mounter.handleResult;
-  executeContext.stdout('\n');
   executeContext.closeOk(null);
 }
 

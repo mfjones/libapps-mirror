@@ -109,7 +109,6 @@ NaClTerm.init = function() {
   }
 
   terminal.setAutoCarriageReturn(true);
-  terminal.setCursorPosition(0, 0);
   terminal.setCursorVisible(true);
   terminal.runCommandClass(NaClTerm, document.location.hash.substr(1));
 
