@@ -404,11 +404,6 @@ wash.mounter.handleResult = function(msg) {
     return;
   }
 
-  if (msg.result) {
-    // success
-    console.log("Mounted!");
-  }
-
   wash.mounter.ops[msg.operationId].callback &&
       wash.mounter.ops[msg.operationId].callback();
   delete wash.mounter.ops[msg.operationId];
