@@ -8,6 +8,6 @@ The aim of this project was to add mounting support to wash (Web Application She
 
 ## Running wash
 
-To get wash up and running, see the Google doc located here: [https://docs.google.com/a/google.com/document/d/1unlDpK1Jd0oDoHVl0Nfv12Xhdv_PbPrUSTb-zl6T5VE/edit?usp=sharing](https://docs.google.com/a/google.com/document/d/1unlDpK1Jd0oDoHVl0Nfv12Xhdv_PbPrUSTb-zl6T5VE/edit?usp=sharing).
+To get wash up and running, see the Google doc located here: [https://docs.google.com/document/d/1dLqb4gRqusab0FCebyE6HuHVk9lnQ_uNTYotMV2a9LM/edit?usp=sharing](https://docs.google.com/document/d/1dLqb4gRqusab0FCebyE6HuHVk9lnQ_uNTYotMV2a9LM/edit?usp=sharing).
 
-For details on how wash works, or if you want to add your own NaCl port to wash, see the document here: [https://docs.google.com/a/google.com/document/d/10aWnw_eRtFvYGv5TXpPJWivctzOeR4AvB-CQISh6aKs/edit?usp=sharing](https://docs.google.com/a/google.com/document/d/10aWnw_eRtFvYGv5TXpPJWivctzOeR4AvB-CQISh6aKs/edit?usp=sharing).
+For details on how wash works, or if you want to add your own NaCl port to wash, see the document here: [https://docs.google.com/document/d/1EXmouz9nGm0w0b2lU03_mhMacsb600-aLPVIa-D0Krk/edit?usp=sharing](https://docs.google.com/document/d/1EXmouz9nGm0w0b2lU03_mhMacsb600-aLPVIa-D0Krk/edit?usp=sharing).
