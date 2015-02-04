@@ -78,18 +78,21 @@ wash.executables.callbacks['cat'] = function(executeContext) {
  */
 wash.executables.callbacks['run'] = function(executeContext) {
   executeContext.ready();
-  var appName = executeContext.arg[0];
-  if (wash.shared_modules.apps[appName] != undefined) {
-    if (wash.shared_modules.handlesMounts[appName])
-      wash.shared_modules.apps[appName].SMmain(wash.mounter.mounts);
-    else
-      wash.shared_modules.apps[appName].SMmain();
-  } else {
+  var USAGE = "Usage: run <app>\n";
+
+  if (!executeContext.arg ||
+      wash.shared_modules.apps[executeContext.arg[0]] == undefined) {
     var availableApps = "";
     for (var appName in wash.shared_modules.apps) {
       availableApps += "* " + appName + "\n";
     }
-    executeContext.stderr("App not found. Installed apps:\n" + availableApps);
+    executeContext.stderr(USAGE + "Installed apps:\n" + availableApps);
+  } else {
+    var appName = executeContext.arg[0];
+    if (wash.shared_modules.handlesMounts[appName])
+      wash.shared_modules.apps[appName].SMmain(wash.mounter.mounts);
+    else
+      wash.shared_modules.apps[appName].SMmain();
   }
 
   executeContext.closeOk(null);
@@ -143,7 +146,7 @@ wash.executables.callbacks['mount'] = function(jsfs, executeContext) {
       executeContext.closeOk(null);
     });
   } else if (command === 'help') {
-    executeContext.stdout("add - Mounts a folder into wash from your local file system.\nls - List the current mounts you have added.\n\tFormat: <path> [<local path>]\nrm - Removes a mount given the <path> (see `ls`).\n");
+    executeContext.stdout("add - Mounts a folder into wash from your local file system.\nls - List the current mounts you have added.\n\tFormat: <path> [<local path>]\nrm - Removes a mount given the <path> (see `lsm`).\n");
     executeContext.closeOk(null);
   } else {
     executeContext.stdout(USAGE);
@@ -182,6 +185,12 @@ function list_dir(dirEntry, callback, topLevel, secondCallback, listing) {
   read_some();
 }
 
+/**
+ * Usage: lsm <mounted file system>
+ *
+ * Same as the `ls` command but used for listing the contents of a folder
+ * mounted from the user's local file system.
+ */
 wash.executables.callbacks['lsm'] = function(executeContext) {
   executeContext.ready();
 
