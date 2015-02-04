@@ -50,6 +50,11 @@ wash.App.prototype.initFileSystem = function(onInit) {
                                       cx.next, cx.error);
     },
 
+    function exes_nacl(cx) {
+      wash.executables.nacl.install(this.jsfs, '/apps/nacl/exe',
+                                    cx.next, cx.error);
+    },
+
     function domfs(cx) {
       this.jsfs.makeEntry('/apps/wash/domfs', new wam.jsfs.dom.FileSystem(),
                           cx.next, cx.error);

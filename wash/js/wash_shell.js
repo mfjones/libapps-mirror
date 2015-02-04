@@ -23,7 +23,8 @@ wash.Shell = function(executeContext) {
     this.executeContext.setEnv('PWD', '/')
 
   this.inputHistory = [];
-  this.executeContext.setEnv('PATH', ['/apps/wash/exe', '/apps/chrome/exe']);
+  this.executeContext.setEnv('PATH', ['/apps/wash/exe', '/apps/chrome/exe',
+      'apps/nacl/exe']);
 
   // The list of currently active jobs.
   this.executeContextList_ = [];

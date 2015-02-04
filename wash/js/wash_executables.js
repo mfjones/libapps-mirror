@@ -22,22 +22,6 @@ wash.executables.install = function(jsfs, path, onSuccess, onError) {
   jsfs.makeEntries(path, exes, onSuccess, onError);
 };
 
-wash.executables.runNaClApp = function(executeContext, name, optionalArgs) {
-  executeContext.ready();
-  window.NaClTerm.nmf = name + '.nmf';
-
-  if (typeof optionalArgs === "undefined")
-    window.NaClTerm.argv = executeContext.arg;
-  else
-    window.NaClTerm.argv = optionalArgs;
-
-  window.NaClTerm.init();
-  window.tw_.term.command.processManager.resultHandler =
-      wash.mounter.handleResult;
-
-  executeContext.closeOk(null);
-}
-
 
 wash.executables.callbacks = {};
 
@@ -110,19 +94,6 @@ wash.executables.callbacks['run'] = function(executeContext) {
 
   executeContext.closeOk(null);
 }
-
-wash.executables.callbacks['vim'] = function(executeContext) {
-  wash.executables.runNaClApp(executeContext, 'vim');
-}
-
-wash.executables.callbacks['ruby'] = function(executeContext) {
-  wash.executables.runNaClApp(executeContext, 'ruby');
-}
-
-wash.executables.callbacks['irb'] = function(executeContext) {
-  wash.executables.runNaClApp(executeContext, 'ruby', ['/bin/irb']);
-}
-
 /**
  * Usage: mount <source> <target>
  *
