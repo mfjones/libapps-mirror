@@ -22,6 +22,23 @@ wash.executables.install = function(jsfs, path, onSuccess, onError) {
   jsfs.makeEntries(path, exes, onSuccess, onError);
 };
 
+wash.executables.runNaClApp = function(executeContext, name, optionalArgs) {
+  executeContext.ready();
+  window.NaClTerm.nmf = name + '.nmf';
+
+  if (typeof optionalArgs === "undefined")
+    window.NaClTerm.argv = executeContext.arg;
+  else
+    window.NaClTerm.argv = optionalArgs;
+
+  window.NaClTerm.init();
+  window.tw_.term.command.processManager.resultHandler =
+      wash.mounter.handleResult;
+
+  executeContext.closeOk(null);
+}
+
+
 wash.executables.callbacks = {};
 
 /**
@@ -95,34 +112,15 @@ wash.executables.callbacks['run'] = function(executeContext) {
 }
 
 wash.executables.callbacks['vim'] = function(executeContext) {
-  executeContext.ready();
-  window.NaClTerm.nmf = 'vim.nmf';
-  window.NaClTerm.argv = executeContext.arg;
-  window.NaClTerm.init();
-  window.tw_.term.command.processManager.resultHandler =
-      wash.mounter.handleResult;
-  executeContext.closeOk(null);
+  wash.executables.runNaClApp(executeContext, 'vim');
 }
 
 wash.executables.callbacks['ruby'] = function(executeContext) {
-  executeContext.ready();
-  window.NaClTerm.nmf = 'ruby.nmf';
-  window.NaClTerm.argv = executeContext.arg;
-  window.NaClTerm.init();
-  window.tw_.term.command.processManager.resultHandler =
-      wash.mounter.handleResult;
-  executeContext.closeOk(null);
+  wash.executables.runNaClApp(executeContext, 'ruby');
 }
 
 wash.executables.callbacks['irb'] = function(executeContext) {
-  executeContext.ready();
-  window.NaClTerm.nmf = 'ruby.nmf';
-  // Start up irb as an additional argument.
-  window.NaClTerm.argv = ['/bin/irb'];
-  window.NaClTerm.init();
-  window.tw_.term.command.processManager.resultHandler =
-      wash.mounter.handleResult;
-  executeContext.closeOk(null);
+  wash.executables.runNaClApp(executeContext, 'ruby', ['/bin/irb']);
 }
 
 /**
