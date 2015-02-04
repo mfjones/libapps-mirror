@@ -24,8 +24,11 @@ wash.executables.nacl.runNaClApp = function(executeContext, name, optionalArgs) 
 
   if (typeof optionalArgs === "undefined")
     window.NaClTerm.argv = executeContext.arg;
-  else
+  else {
+    if (executeContext.arg)
+      optionalArgs.concat(executables.arg);
     window.NaClTerm.argv = optionalArgs;
+  }
 
   window.NaClTerm.init();
   window.tw_.term.command.processManager.resultHandler =
