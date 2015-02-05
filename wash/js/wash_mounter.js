@@ -265,9 +265,13 @@ function addMountControlItem(item, mountControl) {
 
 function mountPointChanged(event) {
   var mountControl = event.target.mountControl;
+  var newPath = mountControl.pathEdit.value;
+  // Must begin with a forward slash, and can not be a single forward slash.
+  if (!newPath.startsWith('/') || newPath === '/')
+    return;
+
   var mount = mountControl.mount;
   var id = mount.entryId;
-  var newPath = mountControl.pathEdit.value;
   wash.mounter.removeMount(mount.path, function() {
     wash.mounter.addMount(
       mount.entry, mount.entryId, mount.localPath, newPath);
