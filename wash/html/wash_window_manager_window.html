@@ -2,71 +2,6 @@
 <html>
   <head>
     <style>
-      body {
-        position: absolute;
-        padding: 0px;
-        margin: 0px;
-        height: 100%;
-        width: 100%;
-      }
-
-      #wash_window_outer {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-      }
-
-      #wash_window_titlebar {
-        background-color: lightgrey;
-        height: 28px;
-        width: 100%;
-        border-bottom: grey;
-        -webkit-app-region: drag;
-      }
-
-      #wash_window_close, #mounter_close {
-        position: absolute;
-        top: 0;
-        right: 0px;
-        width: 28px;
-        height: 28px;
-        padding-top: 1px;
-        font-size: 20px;
-        color: #555;
-        text-align: center;
-        -webkit-app-region: no-drag;
-        cursor: pointer;
-      }
-
-      #wash_window_mount {
-        top: 0;
-        right: 30px;
-        position: absolute;
-        margin: 4px 0 0 0;
-        padding: 3px;
-        text-align: center;
-        border: 1px solid rgb(107, 107, 107);
-        border-radius: 5px;
-        font-size: 11px;
-        color: rgb(107, 107, 107);
-        cursor: pointer;
-        -webkit-app-region: no-drag;
-      }
-
-      #wash_window_mount:hover {
-        color: black;
-        border: 1px solid black;
-      }
-
-      #wash_window_content {
-        position: absolute;
-        top: 28px;
-        width: 100%;
-        box-sizing: border-box;
-        border-bottom: 1px black solid;
-        border-left: 1px black solid;
-        border-right: 1px black solid;
-      }
     </style>
     <link rel="stylesheet" type="text/css" href="mounter.css">
   </head>
@@ -79,7 +14,11 @@
     </div>
     <div id='wash_window_outer'>
       <div id='wash_window_titlebar'>
-        <div id='wash_window_mount'>mount</div>
+        <div id="wash_window_mount">
+          <div class="hamburger_bar"></div>
+          <div class="hamburger_bar"></div>
+          <div class="hamburger_bar"></div>
+        </div>
         <div id='wash_window_close'>&#x2A2F;</div>
       </div>
       <div id='wash_window_content'></div>
