@@ -26,7 +26,7 @@ wash.executables.nacl.runNaClApp = function(executeContext, name, optionalArgs) 
     window.NaClTerm.argv = executeContext.arg;
   else {
     if (executeContext.arg)
-      optionalArgs.concat(executables.arg);
+      optionalArgs = optionalArgs.concat(executeContext.arg);
     window.NaClTerm.argv = optionalArgs;
   }
 
