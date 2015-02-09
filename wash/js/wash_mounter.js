@@ -292,11 +292,23 @@ function cancelMountPointChange(event) {
   mountControl.pathEdit.value = mountControl.mount.path;
 }
 
+function mountPathIsValid(path) {
+  var isValid = false;
+  if (path.startsWith('/')) {
+    if (path.slice(1).search('/') == -1)
+      isValid = true;
+  }
+  return isValid;
+}
+
 function addUpdateOrCancelButtons(event) {
   var mountControl = event.target.mountControl;
 
-  if (mountControl.updateButton && mountControl.cancelButton)
+  if (mountControl.updateButton && mountControl.cancelButton) {
+    mountControl.updateButton.disabled =
+        !mountPathIsValid(mountControl.pathEdit.value);
     return;
+  }
 
   var updateButton = document.createElement('button');
   updateButton.innerHTML = 'Update Mount';
@@ -304,6 +316,7 @@ function addUpdateOrCancelButtons(event) {
   addMountControlItem(updateButton, mountControl);
   mountControl.updateButton = updateButton;
   updateButton.onclick = mountPointChanged;
+  updateButton.disabled = !mountPathIsValid(mountControl.pathEdit.value);
 
   var cancelButton = document.createElement('button');
   cancelButton.innerHTML = 'Cancel';
