@@ -2,8 +2,8 @@
   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5ncCFENUlemRIJLThXHu0SKXcCdkFPgoC9k1vPFx65ww5HeDNUmudhgI6CK1EFwe/IAQuqkYSunrT3XIROry/KLgnsh/ym4AL2fu+3F00ySXo78R0S83EzKlUpeDqo9XuI6YVS9V8/hdhFRrWPc6+Sg72bq3AMGTOpYb618Lo5wIDAQAB",
   "minimum_chrome_version": "23",
   "manifest_version": 2,
-  "name": "Web Application Shell (tot)",
-  "version": "1.5",
+  "name": "Web Application Shell (Demo)",
+  "version": "0.1",
   "icons": {
     "128": "images/dev/128.png"
   },
