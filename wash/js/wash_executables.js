@@ -213,15 +213,19 @@ wash.executables.callbacks['lsm'] = function(executeContext) {
       dirEntry && dirEntry.isDirectory &&
         list_dir(dirEntry, function(listing) {
           listing.forEach(function(entry) {
-            if (entry.fullPath.indexOf(arg) == 0)
-              var out = entry.fullPath.slice(arg.length).slice(1);
-              // If we still have a slash, then this file is inside
-              // a directory, skip it.
-              if (out && out.indexOf("/") === -1) {
-                if (entry.isDirectory)
-                  out += "/";
-                executeContext.stdout(out + "\n");
-              }
+            // Replace the entry's fullpath with our custom path name.
+            var fullPathAry = entry.fullPath.split('/');
+            fullPathAry[1] = arg.split('/')[1];
+            var fullPath = fullPathAry.join('/');
+            if (fullPath.indexOf(arg) == 0)
+              var out = fullPath.slice(arg.length).slice(1);
+            // If we still have a slash, then this file is inside
+            // a directory, skip it.
+            if (out && out.indexOf("/") === -1) {
+              if (entry.isDirectory)
+                out += "/";
+              executeContext.stdout(out + "\n");
+            }
           });
         }, true, function() { executeContext.closeOk(null); });
     }, function() {
