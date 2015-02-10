@@ -267,7 +267,7 @@ function mountPointChanged(event) {
   var mountControl = event.target.mountControl;
   var newPath = mountControl.pathEdit.value;
   // Must begin with a forward slash, and can not be a single forward slash.
-  if (!newPath.startsWith('/') || newPath === '/')
+  if (newPath.indexOf('/') != 0 || newPath === '/')
     return;
 
   var mount = mountControl.mount;
@@ -294,7 +294,7 @@ function cancelMountPointChange(event) {
 
 function mountPathIsValid(path) {
   var isValid = false;
-  if (path.startsWith('/')) {
+  if (path.indexOf('/') == 0) {
     if (path.slice(1).search('/') == -1)
       isValid = true;
   }

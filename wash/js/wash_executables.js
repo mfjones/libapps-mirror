@@ -203,9 +203,9 @@ wash.executables.callbacks['lsm'] = function(executeContext) {
   }
 
   var arg = executeContext.arg[0];
-  if (!arg.startsWith('/'))
+  if (arg.indexOf('/') != 0)
     arg = '/' + arg;
-  if (arg.endsWith('/'))
+  if (arg.indexOf('/', arg.length-1) != -1)
     arg = arg.substring(0, arg.length-1);
 
   wash.mounter.getRootDirectory(arg,
